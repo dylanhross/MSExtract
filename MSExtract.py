@@ -125,7 +125,7 @@ def get_ms_name(param_set, raw_file):
 #		array1 (numpy.ndarray) -- an array with shape (x, m)
 #		array2 (numpy.ndarray) -- an array with shape (y, n)
 #	returns:
-#		none
+#		array1, array2 (numpy.ndarray, numpy.ndarray) -- the (possibly modified) arrays
 def match_data_shape(array1, array2):
 	# store the array column lengths
 	a1_len = array1.shape[1]
@@ -138,6 +138,8 @@ def match_data_shape(array1, array2):
 	elif a2_len > a1_len:
 		# pad array1 with zeros to the match the column length of array2
 		array1 = numpy.pad(array1, ((0,0),(0,(a2_len - a1_len))), mode='constant')
+	# need to return the two (possibly altered) arrays
+	return array1, array2
 
 # cdcr_conv_rawfiles
 #
@@ -183,7 +185,7 @@ def comb_param_set_data(data_files, param_set):
 		# import the next data set
 		add_data = numpy.genfromtxt(data_files[n], unpack=True)
 		# match the column lengths between master_data and add_data so they can be added together
-		match_data_shape(master_data, add_data)
+		master_data,add_data = match_data_shape(master_data, add_data)
 		# append add_data to master_data
 		master_data = numpy.append(master_data, add_data, 0)
 	# save combined data into a csv file
