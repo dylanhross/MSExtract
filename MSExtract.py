@@ -30,7 +30,7 @@ def cdcr_conv_rawfiles(param_set, raw_files):
     ms_files = []
     # loop through raw files
     for raw_file in raw_files:
-    	ms_name = get_ms_name(raw_file)
+    	ms_name = get_ms_name(param_set, raw_file)
         # call CDCReader on each raw file
         call(build_cdcr_call(param_set, raw_file, ms_name))
         # add the ms filename to the list of ms files
@@ -40,14 +40,27 @@ def cdcr_conv_rawfiles(param_set, raw_files):
 
 # get_ms_name
 #
-#   creates a systematic name for the MS file converted from a raw file by CDCReader
+#   creates a systematic name for the MS file converted from a raw file by CDCReader using the
+#	formula: "raw-filename_mzmin-mzmax_dtmin-dtmax_rtmin-rtmax_MS.txt" where all numerical values
+#	are integral (achieved by casting to int, decimals are rounded down)
 #
 #   parameters:
+#		param_set (list) -- list of parameters to use, in order: mz_min, mz_max, dt_min, dt_max
+#                            rt_min, rt_max
 #		raw_file (string) -- name of the current raw file to convert
 #	returns:
 #		ms_filename (string) -- the name of the MS file
-def get_ms_name(raw_file):
-	
+def get_ms_name(param_set, raw_file):
+	# os.path.splitext removes .raw from the end of file name
+	name = os.path.splitext(raw_file)[0] + "_" 
+	# loop through and add the params to the file name
+	for n in range(len(param_set)):
+		name += str(int(param_set[n]))
+		if not n % 2:
+			name += "-"
+		else:
+			name += "_"
+	return name + "MS.txt"
 
 # comb_param_set_data
 #
@@ -59,7 +72,7 @@ def get_ms_name(raw_file):
 #	returns:
 #		none
 def comb_param_set_data(data_files):
-	
+	pass
 
 # build_cdcr_call
 #
@@ -75,6 +88,9 @@ def comb_param_set_data(data_files):
 #   returns:
 #       call_line (string) -- the full function call to CDCReader    
 def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\"):
+	
+	### NOTE: pass is just a placeholder, remove it when you add code here
+	pass
 
 ### MARK: feel free to flesh this funciton out, I have included the code I have used in the past
 ###         for the same thing  |  
@@ -116,7 +132,7 @@ def buildFunctionCall(pathToCDCReader,\
 
 
 # the main execution pathway
-if __name__ == __main__:
+if __name__ == "__main__":
 
     ### NOTE: anything that you want printed to the console during execution should go in
     ###         this section 
@@ -147,7 +163,7 @@ if __name__ == __main__:
     ###         data files, which imports all of the data, combines it, then outputs the final 
     ###         .csv file for that parameter set.
     # loop through parameter set list
-    for n in range param_sets:
+    for n in range(len(param_sets)):
         comb_param_set_data(cdcr_conv_rawfiles(param_sets[:,n], raw_files))
 
     ### TODO: clean up all of the files we do not need anymore (the input files? any files 
