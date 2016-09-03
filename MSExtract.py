@@ -72,7 +72,44 @@ def get_ms_name(param_set, raw_file):
 #	returns:
 #		none
 def comb_param_set_data(data_files):
-	pass
+	# create a master data array starting with the first MS data file
+	master_data = numpy.genfromtxt(data_files[0], unpack=True)
+	# loop through data_files and import their data
+	for n in range(1, len(data_files)):
+		# import the next data set
+		add_data = numpy.genfromtxt(data_files[n], unpack=True)
+		# match the column lengths between master_data and add_data so they can be added together
+		match_data_shape(master_data, add_data)
+		# append add_data to master_data
+		master_data = numpy.append(master_data, add_data, 0)
+	#
+
+# match_data_shape
+#
+#   this method makes sure that the column lengths of two arrays are the same, such that one may be 
+#	appended into the other. If the lengths are unequal, the array with the shorter column length
+#	will be padded to the length of the other array by appending zeros to the ends of the columns
+#	e.g. if two arrays have shapes (x, 5) and (y, 6) the first array will be padded so that it has
+#	shape (x, 6). 
+#
+#   parameters:
+#		array1 (numpy.ndarray) -- an array with shape (x, m)
+#		array2 (numpy.ndarray) -- an array with shape (y, n)
+#	returns:
+#		none
+def match_data_shape(array1, array2):
+	# store the array column lengths
+	a1_len = array1.shape[1]
+	a2_len = array2.shape[1]
+	# compare column lengths using strictly less-than and strictly greater-than, if the lengths are 
+	# equal, there is nothing to do
+	if a1_len > a2_len:
+		# pad array2 with zeros to the match the column length of array1
+		array2 = numpy.pad(array2, ((0,0),(0,(a1_len - a2_len))), mode='constant')
+	elif a2_len > a1_len:
+		# pad array1 with zeros to the match the column length of array2
+		array1 = numpy.pad(array1, ((0,0),(0,(a2_len - a1_len))), mode='constant')
+	
 
 # build_cdcr_call
 #
