@@ -11,7 +11,57 @@ import numpy
 from subprocess import call
 import os
 ### os.remove("filename") to remove a file for cleanup
+import argparse
 
+
+# prep_parser
+#
+#   prepares an argument parser object with all of the command-line flags that will be needed for
+#	this program
+#
+#   parameters:
+#       none
+#   returns:
+#       parser (ArgumentParser) -- an argument parser object
+def prep_parser():
+    
+    ### NOTE: pass is just a placeholder, remove it when you add code here
+	pass
+
+### MARK: feel free to flesh this funciton out, I have included the code I have used in the past
+###         for the same thing  |  
+###                             V
+"""
+    program_description = "This program performs .raw to .txt conversion of all .raw files in \
+                  a specified directory using CDCReader.exe"
+    parser = argparse.ArgumentParser(description=programDescription)
+    parser.add_argument('--data-dir',\
+                        required=True,\
+                        help='directory containing .raw files to convert',\
+                        dest="dataDirectory",\
+                        metavar='/full/path/to/data-dir/')
+    parser.add_argument('--CDCR',\
+                        required=True,\
+                        help='full path to CDCReader.exe',\
+                        dest="pathToCDCReader",\
+                        metavar='/full/path/to/CDCReader.exe')
+    parser.add_argument('--im-bin',\
+                        required=False,\
+                        help='value to bin masses by in IM-data.txt, default = 0.05',\
+                        dest="imBin",\
+                        default=0.05)
+    return parser
+    
+    MARK: we need the following fields of the parser set correctly (i.e. the dest flag in each
+    		add_argument method call):
+    				1. param_set_list_filename -- filename of the parameter set list
+    				2. raw_file_list_filename -- filename of the raw file list
+    				3. clean_up -- must be set to True if -c/--clean-up is included, False otherwise
+    					I am not sure exactly how to do that but im sure you can figure it out from
+    					the documentation
+    		you may also consider adding an (optional?) flag for specifying the location of the
+    		CDCReader.exe executable, like the --CDCR flag above
+"""
 
 
 
@@ -25,10 +75,10 @@ import os
 #       raw_file (string) -- the filename of the .raw file to convert
 #		ms_filename (string) -- the file name of the MS file 
 #       [path_to_cdcr (string)] -- path of the directory containing CDCReader.exe [optional, 
-#                                   default = ".\\" (current working directory)]
+#                                   default = ".\\CDCReader.exe" (current working directory)]
 #   returns:
 #       call_line (string) -- the full function call to CDCReader    
-def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\"):
+def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader.exe"):
 	
 	### NOTE: pass is just a placeholder, remove it when you add code here
 	pass
@@ -37,11 +87,6 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\"):
 ###         for the same thing  |  
 ###                             V
 """
-def buildFunctionCall(pathToCDCReader,\
-                      pathToInputFile,\
-                      outputPath,\
-                      outputBaseName,\
-                      imBin = 0.05):
     # build all the function call flags
     rFlagLine = "--raw_file '" + pathToInputFile + "' "
     mFlagLine = "--ms_file '" + outputPath + "MS_" + outputBaseName + ".txt' "
@@ -74,8 +119,6 @@ def buildFunctionCall(pathToCDCReader,\
 """
 
 
-### DYLAN:  |
-###         V
 # get_param_str
 #
 #   combines a parameter set into a single string using the formula: 
@@ -197,35 +240,24 @@ if __name__ == "__main__":
 
     ### NOTE: anything that you want printed to the console during execution should go in
     ###         this section 
-
-    ### MARK:    |
-    ###          V
-    ### TODO: parse command-line arguments, we need to eventually store the file names of
-    ###         the two input files as strings in variables in this scope so that they can
-    ###         be used for the import statement, I've created the variables with just 
-    ###         empty strings for now. You can use sys.argv to get the arguments but I like
-    ###         argparse since it takes care of all of the formatting and provides a nice
-    ###         interface. It may also be worth while to add an an argument for the path to
-    ###         the CDCReader executable so that this program can still be run outside of
-    ###         the directory containing CDCReader. It may also be a good idea to have a 
-    ###			-c/--clean-up flag that signals whether extra files should be deleted. If 
-    ###			the flag is present set clean_up to True, otherwise set it to False
-    param_set_list_filename = ""
-    raw_file_list_filename = "" 
-    clean_up = False
+    
+    #create an argument parser
+	parser = prep_parser()
+	# get the command line arguments
+    args = parser.parse_args()
 
     # import data from input files
-    param_sets = numpy.genfromtxt(param_set_list_filename, delimiter=',', unpack=True)
-    raw_files = numpy.genfromtxt(raw_file_list_filename, dtype=str)
+    param_sets = numpy.genfromtxt(args.param_set_list_filename, delimiter=',', unpack=True)
+    raw_files = numpy.genfromtxt(args.raw_file_list_filename, dtype=str)
 
     # loop through parameter set list and perform file conversion and data combination for each 
     # parameter set
     for n in range(len(param_sets)):
         comb_param_set_data(cdcr_conv_rawfiles(param_sets[:,n], raw_files), param_sets[:,n])
 
-    ### TODO: clean up all of the files we do not need anymore (the input files? any files 
-    ###         generated by CDCReader) ***OPTIONAL***
-    if clean_up:
+    # if clean-up flag has been set, remove any unneeded files from the working directory
+    if args.clean_up:
+    	
     	### perform cleanup, pass is a placeholder for now
     	pass
     
