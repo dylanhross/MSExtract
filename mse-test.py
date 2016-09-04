@@ -53,9 +53,27 @@ def test_match_data_shape():
 	print "...PASS"
 
 def test_comb_param_set_data():
+	print "testing comb_param_set_data()..."
 	# construct three data files to be stand-ins for CDCReader output files, all different lengths
 	# with different numbers
-	a = np.arange(0)
+	a = np.reshape(np.arange(152.321, 522.125, 0.611), (1,606))
+	b = np.random.rand(1, a.shape[1])
+	c = np.append(a, b, 0)
+	np.savetxt("test01_MS.txt", np.transpose(c), fmt='%8.4f    %8.6f')
+	d = np.reshape(np.arange(345.891, 678.125, 0.4781), (1,np.arange(345.891, 678.125, 0.4781).shape[0]))
+	e = np.random.rand(1, d.shape[1])
+	f = np.append(d, e, 0)
+	np.savetxt("test02_MS.txt", np.transpose(f), fmt='%8.4f    %8.6f')
+	g = np.reshape(np.arange(101.1234, 809.2345, 0.73215), (1,np.arange(101.1234, 809.2345, 0.73215).shape[0]))
+	h = np.random.rand(1, g.shape[1])
+	i = np.append(g, h, 0)
+	np.savetxt("test03_MS.txt", np.transpose(i), fmt='%8.4f    %8.6f')
+	# make a list of the data files just created
+	dfl = ["test01_MS.txt", "test02_MS.txt", "test03_MS.txt"]
+	# call comb_param_set_data()
+	mse.comb_param_set_data(dfl, p)
+	# no errors and the output .csv looked good -> PASS
+	print "...PASS"
 	
 
 ### RUN TESTS

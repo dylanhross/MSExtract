@@ -189,7 +189,7 @@ def comb_param_set_data(data_files, param_set):
 		# append add_data to master_data
 		master_data = numpy.append(master_data, add_data, 0)
 	# save combined data into a csv file
-	numpy.savetxt((get_param_str(param_set) + "combined.csv"), numpy.transpose(master_data), delimiter=",")
+	numpy.savetxt((get_param_str(param_set) + "combined.csv"), numpy.transpose(master_data), delimiter=",", fmt='%.6f')
 
 
 # main execution pathway (invoked when program is called directly)
