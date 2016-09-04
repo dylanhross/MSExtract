@@ -241,11 +241,9 @@ if __name__ == "__main__":
     ### NOTE: anything that you want printed to the console during execution should go in
     ###         this section 
     
-    #create an argument parser
-	parser = prep_parser()
-	# get the command line arguments
-    args = parser.parse_args()
-
+    # create an argument parser and get the command line arguments
+    args = prep_parser().parse_args()
+    
     # import data from input files
     param_sets = numpy.genfromtxt(args.param_set_list_filename, delimiter=',', unpack=True)
     raw_files = numpy.genfromtxt(args.raw_file_list_filename, dtype=str)
@@ -260,5 +258,5 @@ if __name__ == "__main__":
     	
     	### perform cleanup, pass is a placeholder for now
     	pass
-    
+
     
