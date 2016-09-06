@@ -7,11 +7,11 @@
             outputs does it produce, any other requirements/dependencies)
 """
 # import any necessary modules
+import numpy 
 from subprocess import call
 import os
-import re
+### os.remove("filename") to remove a file for cleanup
 import argparse
-import numpy 
 
 
 # prep_parser
@@ -113,10 +113,21 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader
     rFlagLine = "--raw_file '" + pathToInputFile + "' "
     mFlagLine = "--ms_file '" + outputPath + "MS_" + outputBaseName + ".txt' "
     iFlagLine = "--im_file '" + outputPath + "IM_" + outputBaseName + "_bin-" + str(imBin) + ".txt' "
+    msStartLine = "--mass_start " + str(param_set[2]) + " "
+    msEndLine = "--mass_end " + str(param_set[3]) + " "
+    rtScanStartLine = "--scan_start " + str(param_set[4]) + " "
+    rtScanEndLine = "--scan_end " + str(param_set[5]) + " "
+    dtScanStartLine = "--dt_scan_start " + str(param_set[6]) + " "
+    dtScanEndLine = "--dt_scan_end " + str(param_set[7]) + " "
+    
+    
     # do not perform any smoothing
     numberSmoothFlagLine = "--ms_number_smooth 0 "
     smoothWindowFlagLine = "--ms_smooth_window 0 "
-    imBinFlagLine = "--im_bin " + str(imBin) + " "
+    imBinFlagLine = "--im_bin 10 " + str(imBin) + " "
+    
+    # CDCReader Default setting is to average intensity values when binning, here we have set it to sum the values
+    binSumFlagLine = "--bin_sum 1 "
    
    	MARK: I would probably make the --im_bin flag very large (like 5? or something) so that too much
    			time is not wasted creating it. Also, I think you might as well have the --ms_bin flag 
@@ -125,7 +136,7 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader
    			the buildup of junk files
    
     # make the MS binning very large so that too much time isnt wasted creating it
-    msBinFlagLine = "--ms_bin 10 "
+    msBinFlagLine = "--ms_bin 0 "
     # call the function in powershell, via cmd
     callLine = "powershell " +\
                pathToCDCReader + " " +\
@@ -135,7 +146,14 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader
                numberSmoothFlagLine + \
                smoothWindowFlagLine + \
                imBinFlagLine + \
-               msBinFlagLine
+               msBinFlagLine + \
+               msStartLine + \
+               msEndLine + \
+               rtScanStartLine + \
+               rtScanEndLine + \
+               dtScanStartLine + \
+               dtScanEndLine
+               
     # return the line containing the final function call
     return callLine
 """
@@ -269,6 +287,7 @@ def comb_param_set_data(data_files, param_set):
 	# save combined data into a csv file
 	numpy.savetxt((get_csv_name(param_set)), numpy.transpose(master_data), delimiter=",", fmt='%.6f')
 
+
 # clean_up
 #
 #   removes any unneeded files from the current working directory, those being all files generated as 
@@ -309,6 +328,8 @@ if __name__ == "__main__":
 
     # if clean-up flag has been set, remove any unneeded files from the working directory
     if args.clean_up:
-    	clean_up()
+    	
+    	### perform cleanup, pass is a placeholder for now
+    	pass
 
     
