@@ -6,8 +6,8 @@ import numpy as np
 ### CONSTRUCT TEST DATA
 
 # make a params list to test with
-#    mz_min   mz_max   dt_min  dt_max  rt_min   rt_max
-p = [123.456, 234.567, 34,     45,     56,       67]
+#    pep_mz  z  mz_min   mz_max   rt_min  rt_max  dt_min   dt_max
+p = [714.17, 3, 710    , 722     , 41,     46,     55,       65]
 
 ### DEFINE TESTS
 
