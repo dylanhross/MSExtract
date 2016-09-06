@@ -283,7 +283,7 @@ def clean_up():
     pattern = re.compile('_[\d+]-[\d+]_[\d+]-[\d+]_[\d+]-[\d+]_MS.txt$')
     # search through all of the files in the current working directory and remove ones that match the 
     # regular expression for the MS.txt files
-    for name in os.listdir():
+    for name in os.listdir('.'):
         match = re.search(pattern, name)
         if match:
             print name, "would have been removed"

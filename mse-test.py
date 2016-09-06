@@ -75,6 +75,19 @@ def test_comb_param_set_data():
 	# no errors and the output .csv looked good -> PASS
 	print "...PASS"
 	
+def test_clean_up():
+	file_list = ["raw00000001.raw", "raw.number.one.raw", ".hidden-raw-file.raw", "00239120390.raw",\
+			"raw00000001_123-234_34-45_56-67_MS.txt", "raw.number.one_123-234_34-45_56-67_MS.txt",\
+			".hidden-raw-file_123-234_34-45_56-67_MS.txt", "00239120390_123-234_34-45_56-67_MS.txt",\
+			"dont-remove-me_123-234_34-45_56-67_IMS.txt", "or-me_123-234_34-45_56-67_IM.txt",\
+			"not-removed_123-234_34-45_56-67_MS.xvg", "not-removed_123-234_34-45_56-67_MS",\
+			"this-file_should-not_be-removed_MS.txt", "furthermore_and-also_neither-should_this-one_MS.txt"]
+	# create the files (just a bunch of empty files with these names)
+	for name in file_list:
+		f = open(name, "w")
+		f.close()
+	# call clean_up and see which files would have been removed 
+	mse.clean_up()
 
 ### RUN TESTS
 
@@ -84,4 +97,6 @@ def test_comb_param_set_data():
 # already know this works
 #test_match_data_shape()
 
-test_comb_param_set_data()
+#test_comb_param_set_data()
+
+test_clean_up()
