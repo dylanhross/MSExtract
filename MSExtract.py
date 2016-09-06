@@ -24,20 +24,9 @@ import numpy
 #   returns:
 #       parser (ArgumentParser) -- an argument parser object
 def prep_parser():
-    
-    ### NOTE: pass is just a placeholder, remove it when you add code here
-	pass
-
-### MARK: feel free to flesh this funciton out, I have included the code I have used in the past
-###         for the same thing  |  
-###                             V
-"""
     program_description = "This program performs .raw to .txt conversion of all .raw files in \
                   a specified directory using CDCReader.exe"
-    parser = argparse.ArgumentParser(description=program_description)
-    
-### program_description in the above parser line was written as programDescription which was not defined, changed it to program_description
-    
+    parser = argparse.ArgumentParser(description=program_description) 
     parser.add_argument('--data-dir',\
                         required=True,\
                         help='directory containing .raw files to convert',\
@@ -69,23 +58,9 @@ def prep_parser():
     			dest=clean_up,\
     			action='store_true')
     			
-    #The cleanup is not required but when indicated is always true, I think that this works the way we are intending but I need to test it
-    
-    			
+    ### NOTE: The cleanup is not required but when indicated is always true, I think that this works 
+    ###         the way we are intending but I need to test it			
     return parser
-    
-    MARK: we need the following fields of the parser set correctly (i.e. the dest flag in each
-    		add_argument method call):
-    				1. param_set_list_filename -- filename of the parameter set list
-    				2. raw_file_list_filename -- filename of the raw file list
-    				3. clean_up -- must be set to True if -c/--clean-up is included, False otherwise
-    					I am not sure exactly how to do that but im sure you can figure it out from
-    					the documentation
-    		you may also consider adding an (optional?) flag for specifying the location of the
-    		CDCReader.exe executable, like the --CDCR flag above
-"""
-
-
 
 # build_cdcr_call
 #
@@ -101,14 +76,6 @@ def prep_parser():
 #   returns:
 #       call_line (string) -- the full function call to CDCReader    
 def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader.exe"):
-	
-	### NOTE: pass is just a placeholder, remove it when you add code here
-	pass
-
-### MARK: feel free to flesh this funciton out, I have included the code I have used in the past
-###         for the same thing  |  
-###                             V
-"""
     # build all the function call flags
     rFlagLine = "--raw_file '" + pathToInputFile + "' "
     mFlagLine = "--ms_file '" + outputPath + "MS_" + outputBaseName + ".txt' "
@@ -119,26 +86,15 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader
     rtScanEndLine = "--scan_end " + str(param_set[5]) + " "
     dtScanStartLine = "--dt_scan_start " + str(param_set[6]) + " "
     dtScanEndLine = "--dt_scan_end " + str(param_set[7]) + " "
-    
-    
     # do not perform any smoothing
     numberSmoothFlagLine = "--ms_number_smooth 0 "
     smoothWindowFlagLine = "--ms_smooth_window 0 "
     imBinFlagLine = "--im_bin 10 " + str(imBin) + " "
-    
     # CDCReader Default setting is to average intensity values when binning, here we have set it to sum the values
     binSumFlagLine = "--bin_sum 1 "
-   
-   	MARK: I would probably make the --im_bin flag very large (like 5? or something) so that too much
-   			time is not wasted creating it. Also, I think you might as well have the --ms_bin flag 
-   			set to 0 for completely unbinned MS data. Also, if you set the --im_file flag to a 
-   			constant value, it will be overwritten each time CDCReader is called, which would reduce
-   			the buildup of junk files
-   
-    # make the MS binning very large so that too much time isnt wasted creating it
     msBinFlagLine = "--ms_bin 0 "
-    # call the function in powershell, via cmd
-    callLine = "powershell " +\
+    # call_line corresponds to function call, via cmd
+    call_line = "powershell " +\
                pathToCDCReader + " " +\
                rFlagLine + \
                mFlagLine + \
@@ -152,11 +108,10 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader
                rtScanStartLine + \
                rtScanEndLine + \
                dtScanStartLine + \
-               dtScanEndLine
-               
+               dtScanEndLine 
     # return the line containing the final function call
-    return callLine
-"""
+    return call_line
+
 
 
 # get_param_str
