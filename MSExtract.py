@@ -7,11 +7,11 @@
             outputs does it produce, any other requirements/dependencies)
 """
 # import any necessary modules
-import numpy 
 from subprocess import call
 import os
-### os.remove("filename") to remove a file for cleanup
+import re
 import argparse
+import numpy 
 
 
 # prep_parser
@@ -269,6 +269,25 @@ def comb_param_set_data(data_files, param_set):
 	# save combined data into a csv file
 	numpy.savetxt((get_csv_name(param_set)), numpy.transpose(master_data), delimiter=",", fmt='%.6f')
 
+# clean_up
+#
+#   removes any unneeded files from the current working directory, those being all files generated as 
+#   outputs from CDCReader.exe: IM.txt + (all ...MS.txt files)
+#
+#   parameters:
+#		none
+#	returns:
+#		none
+def clean_up():
+    # create a regular expression pattern to search for
+    pattern = re.compile('_[\d+]-[\d+]_[\d+]-[\d+]_[\d+]-[\d+]_MS.txt$')
+    # search through all of the files in the current working directory and remove ones that match the 
+    # regular expression for the MS.txt files
+    for name in os.listdir():
+        match = re.search(pattern, name)
+        if match:
+            print name, "would have been removed"
+            #os.remove(name)
 
 # main execution pathway (invoked when program is called directly)
 if __name__ == "__main__":
@@ -290,8 +309,6 @@ if __name__ == "__main__":
 
     # if clean-up flag has been set, remove any unneeded files from the working directory
     if args.clean_up:
-    	
-    	### perform cleanup, pass is a placeholder for now
-    	pass
+    	clean_up()
 
     
