@@ -34,7 +34,10 @@ def prep_parser():
 """
     program_description = "This program performs .raw to .txt conversion of all .raw files in \
                   a specified directory using CDCReader.exe"
-    parser = argparse.ArgumentParser(description=programDescription)
+    parser = argparse.ArgumentParser(description=program_description)
+    
+### program_description in the above parser line was written as programDescription which was not defined, changed it to program_description
+    
     parser.add_argument('--data-dir',\
                         required=True,\
                         help='directory containing .raw files to convert',\
@@ -50,6 +53,17 @@ def prep_parser():
                         help='value to bin masses by in IM-data.txt, default = 0.05',\
                         dest="imBin",\
                         default=0.05)
+    parser.add_argument('--param_set_list_filename',\
+    			required=True,\
+    			help='File containing parameter set list',\
+    			dest="param_set_list_filename.csv",\
+    			metavar='/full/path/to/folder_containing_paramsetlist.csv')
+    parser.add_argument('raw_file_list_filename',\
+    			required=True,\
+    			help='Plain text list containing HDX .raw file names',\
+    			dest="raw_file_list.txt",\
+    			metavar='/full/path/to/.raw/file.txt')
+    			
     return parser
     
     MARK: we need the following fields of the parser set correctly (i.e. the dest flag in each
