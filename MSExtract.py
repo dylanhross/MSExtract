@@ -84,8 +84,8 @@ def prep_parser():
 #   builds a function to CDCReader.exe using a parameter set and a .raw filename
 #
 #   parameters:
-#       param_set (list) -- list of parameters to use, in order: mz_min, mz_max, dt_min, dt_max
-#                            rt_min, rt_max
+#		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
+#                           rt_max, dt_min, dt_max
 #       raw_file (string) -- the filename of the .raw file to convert
 #		ms_filename (string) -- the file name of the MS file 
 #       [path_to_cdcr (string)] -- path of the directory containing CDCReader.exe [optional, 
@@ -136,17 +136,16 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader
 # get_param_str
 #
 #   combines a parameter set into a single string using the formula: 
-#	"mzmin-mzmax_dtmin-dtmax_rtmin-rtmax_" where all numerical values are integral (achieved by 
+#	"mzmin-mzmax_rtmin-rtmax_dtmin-dtmax_" where all numerical values are integral (achieved by 
 #	casting to int, decimals are rounded down)
 #
 #   parameters:
-#		param_set (list) -- list of parameters to use, in order: mz_min, mz_max, dt_min, dt_max
-#                            rt_min, rt_max
+#		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
+#                           rt_max, dt_min, dt_max
 #	returns:
 #		param_str (string) -- parameters collapsed into a string
 def get_param_str(param_set):
-	param_str = ""
-	for n in range(len(param_set)):
+	for n in range(2, len(param_set)):
 		param_str += str(int(param_set[n]))
 		if not n % 2:
 			param_str += "-"
@@ -161,14 +160,28 @@ def get_param_str(param_set):
 #	are integral (achieved by casting to int, decimals are rounded down)
 #
 #   parameters:
-#		param_set (list) -- list of parameters to use, in order: mz_min, mz_max, dt_min, dt_max
-#                            rt_min, rt_max
+#		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
+#                           rt_max, dt_min, dt_max
 #		raw_file (string) -- name of the current raw file to convert
 #	returns:
 #		ms_filename (string) -- the name of the MS file
 def get_ms_name(param_set, raw_file):
 	# os.path.splitext removes .raw from the end of file name
 	return os.path.splitext(raw_file)[0] + "_" + get_param_str(param_set) + "MS.txt"
+
+# get_csv_name
+#
+#   creates a systematic name for the .csv output file using the formula: "pepmz_z.csv" where pepmz
+#   is the peptide mz parameter with any decimal values represented with a p in place of the decimal 
+#   point (e.g. 123.456 -> 123p456)
+#
+#   parameters:
+#		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
+#                           rt_max, dt_min, dt_max
+#	returns:
+#		csv_filename (string) -- the name of the MS file
+def get_csv_name(param_set):
+	return str(param_set[0]).replace(".", "p") + "_" + str(param_set[1]) + ".csv"
 
 # match_data_shape
 #
@@ -203,8 +216,8 @@ def match_data_shape(array1, array2):
 #   loops through a list of raw files making calls to CDCReader using a parameter set
 #
 #   parameters:
-#		param_set (list) -- list of parameters to use, in order: mz_min, mz_max, dt_min, dt_max
-#                            rt_min, rt_max
+#		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
+#                           rt_max, dt_min, dt_max
 #		raw_files (list) -- list of raw files to convert with CDCReader
 #	returns:
 #		ms_files (list) -- a list of CDCReader output MS.txt files generated using one parameter set
@@ -225,13 +238,13 @@ def cdcr_conv_rawfiles(param_set, raw_files):
 # comb_param_set_data
 #
 #   combines all of the extracted MS data files generated using a single parameter set into one .csv
-#	file named using the formula: "mzmin-mzmax_dtmin-dtmax_rtmin-rtmax_combined.csv"
+#	file named using the formula: "pepmz_z.csv"
 #
 #   parameters:
 #		data_files (list) -- a list of CDCReader output MS.txt files generated using a single
 #								parameter set
-#		param_set (list) -- list of parameters to use, in order: mz_min, mz_max, dt_min, dt_max
-#                            rt_min, rt_max
+#		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
+#                           rt_max, dt_min, dt_max
 #	returns:
 #		none
 def comb_param_set_data(data_files, param_set):
@@ -246,7 +259,7 @@ def comb_param_set_data(data_files, param_set):
 		# append add_data to master_data
 		master_data = numpy.append(master_data, add_data, 0)
 	# save combined data into a csv file
-	numpy.savetxt((get_param_str(param_set) + "combined.csv"), numpy.transpose(master_data), delimiter=",", fmt='%.6f')
+	numpy.savetxt((get_csv_name(param_set)), numpy.transpose(master_data), delimiter=",", fmt='%.6f')
 
 
 # main execution pathway (invoked when program is called directly)
