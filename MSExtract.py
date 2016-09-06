@@ -53,16 +53,24 @@ def prep_parser():
                         help='value to bin masses by in IM-data.txt, default = 0.05',\
                         dest="imBin",\
                         default=0.05)
-    parser.add_argument('--param_set_list_filename',\
+    parser.add_argument('--param_set_list','-p',\
     			required=True,\
     			help='File containing parameter set list',\
-    			dest="param_set_list_filename.csv",\
+    			dest="param_set_list_filename",\
     			metavar='/full/path/to/folder_containing_paramsetlist.csv')
-    parser.add_argument('raw_file_list_filename',\
+    parser.add_argument('--raw_file_list','-r',\
     			required=True,\
     			help='Plain text list containing HDX .raw file names',\
-    			dest="raw_file_list.txt",\
+    			dest="raw_file_list_filename",\
     			metavar='/full/path/to/.raw/file.txt')
+    parser.add_argument('--clean_up', '-c',\
+    			required=False
+    			help='Clean up unecessary files after completion',\
+    			dest=clean_up,\
+    			action='store_true')
+    			
+    #The cleanup is not required but when indicated is always true, I think that this works the way we are intending but I need to test it
+    
     			
     return parser
     
