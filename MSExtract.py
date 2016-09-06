@@ -7,11 +7,11 @@
             outputs does it produce, any other requirements/dependencies)
 """
 # import any necessary modules
-import numpy 
 from subprocess import call
 import os
-### os.remove("filename") to remove a file for cleanup
+import re
 import argparse
+import numpy 
 
 
 # prep_parser
@@ -328,8 +328,6 @@ if __name__ == "__main__":
 
     # if clean-up flag has been set, remove any unneeded files from the working directory
     if args.clean_up:
-    	
-    	### perform cleanup, pass is a placeholder for now
-    	pass
+    	clean_up()
 
     
