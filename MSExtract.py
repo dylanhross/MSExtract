@@ -26,16 +26,13 @@ import numpy
 def prep_parser():
     program_description = "This program performs .raw to .txt conversion of all .raw files in \
                   a specified directory using CDCReader.exe"
+    # initialize an ArgumentParser with the program description
     parser = argparse.ArgumentParser(description=program_description) 
-    parser.add_argument('--data-dir',\
-                        required=True,\
-                        help='directory containing .raw files to convert',\
-                        dest="dataDirectory",\
-                        metavar='/full/path/to/data-dir/')
+    # add arguments to the parser
     parser.add_argument('--CDCR',\
                         required=True,\
                         help='full path to CDCReader.exe',\
-                        dest="pathToCDCReader",\
+                        dest="path_to_cdcr",\
                         metavar='/full/path/to/CDCReader.exe')
     parser.add_argument('--im-bin',\
                         required=False,\
@@ -43,20 +40,20 @@ def prep_parser():
                         dest="imBin",\
                         default=0.05)
     parser.add_argument('--param_set_list','-p',\
-    			required=True,\
-    			help='File containing parameter set list',\
-    			dest="param_set_list_filename",\
-    			metavar='/full/path/to/folder_containing_paramsetlist.csv')
+    			        required=True,\
+    			        help='File containing parameter set list',\
+    			        dest="param_set_list_filename",\
+    			        metavar='/full/path/to/folder_containing/paramsetlist.csv')
     parser.add_argument('--raw_file_list','-r',\
-    			required=True,\
-    			help='Plain text list containing HDX .raw file names',\
-    			dest="raw_file_list_filename",\
-    			metavar='/full/path/to/.raw/file.txt')
+    			        required=True,\
+    			        help='Plain text list containing HDX .raw file names',\
+    			        dest="raw_file_list_filename",\
+    			        metavar='/full/path/to/raw_file_list.csv')
     parser.add_argument('--clean_up', '-c',\
-    			required=False
-    			help='Clean up unecessary files after completion',\
-    			dest=clean_up,\
-    			action='store_true')
+    			        required=False,\
+    			        help='Clean up unecessary files after completion',\
+    			        dest=clean_up,\
+    			        action='store_true')
     			
     ### NOTE: The cleanup is not required but when indicated is always true, I think that this works 
     ###         the way we are intending but I need to test it			
@@ -75,17 +72,17 @@ def prep_parser():
 #                                   default = ".\\CDCReader.exe" (current working directory)]
 #   returns:
 #       call_line (string) -- the full function call to CDCReader    
-def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader.exe"):
+def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr):
     # build all the function call flags
-    rFlagLine = "--raw_file '" + pathToInputFile + "' "
-    mFlagLine = "--ms_file '" + outputPath + "MS_" + outputBaseName + ".txt' "
-    iFlagLine = "--im_file '" + outputPath + "IM_" + outputBaseName + "_bin-" + str(imBin) + ".txt' "
-    msStartLine = "--mass_start " + str(param_set[2]) + " "
-    msEndLine = "--mass_end " + str(param_set[3]) + " "
-    rtScanStartLine = "--scan_start " + str(param_set[4]) + " "
-    rtScanEndLine = "--scan_end " + str(param_set[5]) + " "
-    dtScanStartLine = "--dt_scan_start " + str(param_set[6]) + " "
-    dtScanEndLine = "--dt_scan_end " + str(param_set[7]) + " "
+    r_flag = "--raw_file '" + raw_file + "' "
+    m_flag = "--ms_file '" + ms_filename + "' "
+    i_flag = "--im_file 'IM.txt' "
+    ms_start_flag = "--mass_start " + str(param_set[2]) + " "
+    ms_end_flag = "--mass_end " + str(param_set[3]) + " "
+    rt_scan_start_flag = "--scan_start " + str(param_set[4]) + " "
+    rt_scan_end_flag = "--scan_end " + str(param_set[5]) + " "
+    dt_scan_start_flag = "--dt_scan_start " + str(param_set[6]) + " "
+    dt_scan_end_flag = "--dt_scan_end " + str(param_set[7]) + " "
     # do not perform any smoothing
     numberSmoothFlagLine = "--ms_number_smooth 0 "
     smoothWindowFlagLine = "--ms_smooth_window 0 "
@@ -95,24 +92,22 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr=".\\CDCReader
     msBinFlagLine = "--ms_bin 0 "
     # call_line corresponds to function call, via cmd
     call_line = "powershell " +\
-               pathToCDCReader + " " +\
-               rFlagLine + \
-               mFlagLine + \
-               iFlagLine + \
+               path_to_cdcr + " " +\
+               r_flag + \
+               m_flag + \
+               i_flag + \
                numberSmoothFlagLine + \
                smoothWindowFlagLine + \
                imBinFlagLine + \
                msBinFlagLine + \
-               msStartLine + \
-               msEndLine + \
-               rtScanStartLine + \
-               rtScanEndLine + \
-               dtScanStartLine + \
-               dtScanEndLine 
+               ms_start_flag + \
+               ms_end_flag + \
+               rt_scan_start_flag + \
+               rt_scan_end_flag + \
+               dt_scan_start_flag + \
+               dt_scan_end_flag 
     # return the line containing the final function call
     return call_line
-
-
 
 # get_param_str
 #
@@ -200,16 +195,17 @@ def match_data_shape(array1, array2):
 #		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
 #                           rt_max, dt_min, dt_max
 #		raw_files (list) -- list of raw files to convert with CDCReader
+#       path_to_cdcr (string) -- full path to the CDCReader executable
 #	returns:
 #		ms_files (list) -- a list of CDCReader output MS.txt files generated using one parameter set
-def cdcr_conv_rawfiles(param_set, raw_files):
+def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr):
     # create a list of MS files to eventually combine
     ms_files = []
     # loop through raw files
     for raw_file in raw_files:
     	ms_name = get_ms_name(param_set, raw_file)
         # call CDCReader on each raw file
-        call(build_cdcr_call(param_set, raw_file, ms_name))
+        call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
         # add the ms filename to the list of ms files
         ms_files.append(ms_name)
     # return the list of converted ms files
@@ -254,14 +250,19 @@ def comb_param_set_data(data_files, param_set):
 #		none
 def clean_up():
     # create a regular expression pattern to search for
-    pattern = re.compile('_[\d+]-[\d+]_[\d+]-[\d+]_[\d+]-[\d+]_MS.txt$')
+    # looks for:
+    #    *anything*_*number*-*number*_*number*-*number*_*number*-*number*_MS.txt
+    pattern = re.compile('.*_(\d+-\d+_){3}MS\.txt$')
     # search through all of the files in the current working directory and remove ones that match the 
     # regular expression for the MS.txt files
     for name in os.listdir('.'):
-        match = re.search(pattern, name)
-        if match:
+        if pattern.match(name):
+
+            ### TODO: remove this print statement and uncomment os.remove(name) when ready
+
             print name, "would have been removed"
             #os.remove(name)
+            
 
 # main execution pathway (invoked when program is called directly)
 if __name__ == "__main__":
@@ -279,7 +280,7 @@ if __name__ == "__main__":
     # loop through parameter set list and perform file conversion and data combination for each 
     # parameter set
     for n in range(len(param_sets)):
-        comb_param_set_data(cdcr_conv_rawfiles(param_sets[:,n], raw_files), param_sets[:,n])
+        comb_param_set_data(cdcr_conv_rawfiles(param_sets[:,n], raw_files, args.path_to_cdcr), param_sets[:,n])
 
     # if clean-up flag has been set, remove any unneeded files from the working directory
     if args.clean_up:
