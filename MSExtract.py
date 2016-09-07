@@ -62,15 +62,14 @@ def prep_parser():
 #		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
 #                           rt_max, dt_min, dt_max
 #       raw_file (string) -- the filename of the .raw file to convert
-#		ms_filename (string) -- the file name of the MS file 
-#       [path_to_cdcr (string)] -- path of the directory containing CDCReader.exe [optional, 
-#                                   default = ".\\CDCReader.exe" (current working directory)]
+#		ms_file (string) -- the file name of the MS file 
+#       path_to_cdcr (string) -- path of the directory containing CDCReader.exe 
 #   returns:
 #       call_line (string) -- the full function call to CDCReader    
 def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr):
     # build all the function call flags
     r_flag = "--raw_file '" + raw_file + "' "
-    m_flag = "--ms_file '" + ms_filename + "' "
+    m_flag = "--ms_file '" + ms_file + "' "
     i_flag = "--im_file 'IM.txt' "
     ms_start_flag = "--mass_start " + str(param_set[2]) + " "
     ms_end_flag = "--mass_end " + str(param_set[3]) + " "
@@ -81,7 +80,7 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr):
     # do not perform any smoothing
     numberSmoothFlagLine = "--ms_number_smooth 0 "
     smoothWindowFlagLine = "--ms_smooth_window 0 "
-    imBinFlagLine = "--im_bin 10 " + str(imBin) + " "
+    imBinFlagLine = "--im_bin 10 "
     # CDCReader Default setting is to average intensity values when binning, here we have set it to sum the values
     binSumFlagLine = "--bin_sum 1 "
     msBinFlagLine = "--ms_bin 0 "
