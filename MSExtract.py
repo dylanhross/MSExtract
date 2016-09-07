@@ -32,22 +32,22 @@ def prep_parser():
     parser.add_argument('--CDCR',\
                         required=True,\
                         help='full path to CDCReader.exe',\
-                        dest="path_to_cdcr",\
+                        dest='path_to_cdcr',\
                         metavar='/full/path/to/CDCReader.exe')
-    parser.add_argument('--param_set_list','-p',\
+    parser.add_argument('-p', '--param_set_list',\
     			        required=True,\
     			        help='File containing parameter set list',\
-    			        dest="param_set_list_filename",\
-    			        metavar='/full/path/to/folder_containing/paramsetlist.csv')
-    parser.add_argument('--raw_file_list','-r',\
+    			        dest='param_set_list_filename',\
+    			        metavar='/full/path/to/paramsetlist.csv')
+    parser.add_argument('-r', '--raw_file_list',\
     			        required=True,\
     			        help='Plain text list containing HDX .raw file names',\
-    			        dest="raw_file_list_filename",\
+    			        dest='raw_file_list_filename',\
     			        metavar='/full/path/to/raw_file_list.csv')
-    parser.add_argument('--clean_up', '-c',\
+    parser.add_argument('-c', '--clean_up',\
     			        required=False,\
     			        help='Clean up unecessary files after completion',\
-    			        dest=clean_up,\
+    			        dest='clean_up',\
     			        action='store_true')
     			
     ### NOTE: The cleanup is not required but when indicated is always true, I think that this works 
