@@ -34,11 +34,6 @@ def prep_parser():
                         help='full path to CDCReader.exe',\
                         dest="path_to_cdcr",\
                         metavar='/full/path/to/CDCReader.exe')
-    parser.add_argument('--im-bin',\
-                        required=False,\
-                        help='value to bin masses by in IM-data.txt, default = 0.05',\
-                        dest="imBin",\
-                        default=0.05)
     parser.add_argument('--param_set_list','-p',\
     			        required=True,\
     			        help='File containing parameter set list',\
@@ -262,7 +257,7 @@ def clean_up():
 
             print name, "would have been removed"
             #os.remove(name)
-            
+
 
 # main execution pathway (invoked when program is called directly)
 if __name__ == "__main__":
@@ -273,6 +268,10 @@ if __name__ == "__main__":
     # create an argument parser and get the command line arguments
     args = prep_parser().parse_args()
     
+    ### TODO: uncomment this code piece by piece as we test each step in the protocol
+    ###         |
+    ###         V
+    """
     # import data from input files
     param_sets = numpy.genfromtxt(args.param_set_list_filename, delimiter=',', unpack=True)
     raw_files = numpy.genfromtxt(args.raw_file_list_filename, dtype=str)
@@ -285,5 +284,5 @@ if __name__ == "__main__":
     # if clean-up flag has been set, remove any unneeded files from the working directory
     if args.clean_up:
     	clean_up()
-
+    """
     
