@@ -34,17 +34,17 @@ def prep_parser():
                         help='full path to CDCReader.exe',\
                         dest='path_to_cdcr',\
                         metavar='/full/path/to/CDCReader.exe')
-    parser.add_argument('-p', '--param_set_list',\
+    parser.add_argument('-pl', '--param-set-list',\
     			        required=True,\
     			        help='File containing parameter set list',\
     			        dest='param_set_list_filename',\
-    			        metavar='/full/path/to/paramsetlist.csv')
-    parser.add_argument('-r', '--raw_file_list',\
+    			        metavar='/full/path/to/param_set_list.csv')
+    parser.add_argument('-rl', '--raw-file-list',\
     			        required=True,\
     			        help='Plain text list containing HDX .raw file names',\
     			        dest='raw_file_list_filename',\
-    			        metavar='/full/path/to/raw_file_list.csv')
-    parser.add_argument('-c', '--clean_up',\
+    			        metavar='/full/path/to/raw_file_list.txt')
+    parser.add_argument('-c', '--clean-up',\
     			        required=False,\
     			        help='Clean up unecessary files after completion',\
     			        dest='clean_up',\
@@ -264,7 +264,9 @@ if __name__ == "__main__":
     ### NOTE: anything that you want printed to the console during execution should go in
     ###         this section 
     
+
     # create an argument parser and get the command line arguments
+    print
     args = prep_parser().parse_args()
     
     ### TODO: uncomment this code piece by piece as we test each step in the protocol

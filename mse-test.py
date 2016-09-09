@@ -89,6 +89,20 @@ def test_clean_up():
 	# call clean_up and see which files would have been removed 
 	mse.clean_up()
 
+def test_parse_args():
+	print
+	print "Testing argument parsing..."
+	args = mse.prep_parser().parse_args()
+	print "for path to CDCReader.exe you entered:", args.path_to_cdcr
+	print "for path to param-set-list.csv you entered:", args.param_set_list_filename
+	print "for path to raw-file-list.txt you entered:", args.raw_file_list_filename
+	if args.clean_up:
+		print "you did select clean up"
+	else:
+		print "you did not select clean up"
+	print "...DONE"
+
+
 ### RUN TESTS
 
 # broke this one by changing the naming scheme slightly
@@ -102,3 +116,7 @@ def test_clean_up():
 
 # the right file names to be removed were generated, clean_up should work...
 #test_clean_up()
+
+# argument parsing wirks as it should, the proper values are stored and the 
+# double dash flags work as well as the short flags
+#test_parse_args()
