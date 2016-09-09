@@ -66,7 +66,7 @@ def prep_parser():
 #       path_to_cdcr (string) -- path of the directory containing CDCReader.exe 
 #   returns:
 #       call_line (string) -- the full function call to CDCReader    
-def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr):
+def build_cdcr_call(param_set, raw_file, ms_file, path_to_cdcr):
     # build all the function call flags
     r_flag = "--raw_file '" + raw_file + "' "
     m_flag = "--ms_file '" + ms_file + "' "
@@ -115,13 +115,14 @@ def build_cdcr_call(param_set, raw_file, ms_filename, path_to_cdcr):
 #	returns:
 #		param_str (string) -- parameters collapsed into a string
 def get_param_str(param_set):
-	for n in range(2, len(param_set)):
+    param_str = ""
+    for n in range(2, len(param_set)):
 		param_str += str(int(param_set[n]))
 		if not n % 2:
 			param_str += "-"
 		else:
 			param_str += "_"
-	return param_str
+    return param_str
 
 # get_ms_name
 #
@@ -200,7 +201,7 @@ def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr):
     	ms_name = get_ms_name(param_set, raw_file)
 
         ### DEBUG: print out the call to CDCReader but do not actually call it
-        print build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
+        print build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr)
         
         # call CDCReader on each raw file
         #call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
