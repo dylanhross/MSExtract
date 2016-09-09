@@ -102,6 +102,13 @@ def test_parse_args():
 		print "you did not select clean up"
 	print "...DONE"
 
+def test_cdcr_conv_raw_files():
+	print
+	print "Testing cdcr_conv_raw_files()..."
+	# parse the command line arguments 
+	args = mse.prep_parser().parse_args()
+	# call cdcr_conv_raw_files
+	cdcr_conv_rawfiles(param_sets[:,n], raw_files, args.path_to_cdcr)
 
 ### RUN TESTS
 

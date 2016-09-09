@@ -198,8 +198,13 @@ def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr):
     # loop through raw files
     for raw_file in raw_files:
     	ms_name = get_ms_name(param_set, raw_file)
+
+        ### DEBUG: print out the call to CDCReader but do not actually call it
+        print build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
+        
         # call CDCReader on each raw file
-        call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
+        #call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
+
         # add the ms filename to the list of ms files
         ms_files.append(ms_name)
     # return the list of converted ms files
@@ -252,7 +257,7 @@ def clean_up():
     for name in os.listdir('.'):
         if pattern.match(name):
 
-            ### TODO: remove this print statement and uncomment os.remove(name) when ready
+            ### DEBUG: prints what files would have been removed but does not remove them
 
             print name, "would have been removed"
             #os.remove(name)
