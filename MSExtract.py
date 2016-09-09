@@ -73,6 +73,12 @@ def build_cdcr_call(param_set, raw_file, ms_file, path_to_cdcr):
     i_flag = "--im_file 'IM.txt' "
     ms_start_flag = "--mass_start " + str(param_set[2]) + " "
     ms_end_flag = "--mass_end " + str(param_set[3]) + " "
+
+    ### MARK: we need to test this out with actual calls to CDCReader but I am curious if the values for 
+    ###         scan start/end and dt scan start/end need to be cast to ints (or rounded then cast to 
+    ###         ints) prior to the cast to strings? I dont know but I think that CDCReader may expect 
+    ###         integers since the values are binned
+
     rt_scan_start_flag = "--scan_start " + str(param_set[4]) + " "
     rt_scan_end_flag = "--scan_end " + str(param_set[5]) + " "
     dt_scan_start_flag = "--dt_scan_start " + str(param_set[6]) + " "
