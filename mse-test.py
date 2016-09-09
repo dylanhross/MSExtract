@@ -108,7 +108,11 @@ def test_cdcr_conv_raw_files():
 	# parse the command line arguments 
 	args = mse.prep_parser().parse_args()
 	# call cdcr_conv_raw_files
-	cdcr_conv_rawfiles(param_sets[:,n], raw_files, args.path_to_cdcr)
+	param_sets = numpy.genfromtxt(args.param_set_list_filename, delimiter=',', unpack=True)
+    raw_files = numpy.genfromtxt(args.raw_file_list_filename, dtype=str)
+	msfiles = cdcr_conv_rawfiles(param_sets[:,0], raw_files, args.path_to_cdcr)
+	print
+	print "MS FILES THAT WOULD BE GENERATED:", msfiles
 
 ### RUN TESTS
 
