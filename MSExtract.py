@@ -49,6 +49,11 @@ def prep_parser():
     			        help='Clean up unecessary files after completion',\
     			        dest='clean_up',\
     			        action='store_true')
+    parser.add_argument('-v', '--verbose',\
+    			        required=False,\
+    			        help='Be loud and noisy',\
+    			        dest='verbose',\
+    			        action='store_true')
     			
     ### NOTE: The cleanup is not required but when indicated is always true, I think that this works 
     ###         the way we are intending but I need to test it			
@@ -197,20 +202,28 @@ def match_data_shape(array1, array2):
 #                           rt_max, dt_min, dt_max
 #		raw_files (list) -- list of raw files to convert with CDCReader
 #       path_to_cdcr (string) -- full path to the CDCReader executable
+#       [quiet (boolean)] -- don't print any information about what files are being converted 
+#                               [default = True] 
 #	returns:
 #		ms_files (list) -- a list of CDCReader output MS.txt files generated using one parameter set
-def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr):
+def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr, quiet=True):
     # create a list of MS files to eventually combine
     ms_files = []
     # loop through raw files
     for raw_file in raw_files:
     	ms_name = get_ms_name(param_set, raw_file)
 
-        ### DEBUG: print out the call to CDCReader but do not actually call it
-        print build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr)
-        
+        if not quiet:
+            print "Now converting " + raw_file + " using parameter set " + get_param_str(param_set) + "..."
+     
         # call CDCReader on each raw file
         #call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
+        print
+        print build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr)
+        print
+
+        if not quiet:
+            print "...DONE"
 
         # add the ms filename to the list of ms files
         ms_files.append(ms_name)
@@ -292,7 +305,7 @@ if __name__ == "__main__":
     # loop through parameter set list and perform file conversion and data combination for each 
     # parameter set
     for n in range(len(param_sets)):
-        comb_param_set_data(cdcr_conv_rawfiles(param_sets[:,n], raw_files, args.path_to_cdcr), param_sets[:,n])
+        comb_param_set_data(cdcr_conv_rawfiles(param_sets[:,n], raw_files, args.path_to_cdcr, quiet=(not args.verbose), param_sets[:,n])
 
     # if clean-up flag has been set, remove any unneeded files from the working directory
     if args.clean_up:

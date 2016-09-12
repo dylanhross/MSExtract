@@ -118,7 +118,7 @@ def test_cdcr_conv_raw_files():
 	print "raw files:", raw_files 
 	print
 
-	msfiles = mse.cdcr_conv_rawfiles(param_sets[:,0], raw_files, args.path_to_cdcr)
+	msfiles = mse.cdcr_conv_rawfiles(param_sets[:,0], raw_files, args.path_to_cdcr, quiet=(not args.verbose))
 	print
 	print "MS FILES THAT WOULD BE GENERATED:", msfiles
 
@@ -136,7 +136,7 @@ def test_cdcr_conv_raw_files():
 # the right file names to be removed were generated, clean_up should work...
 #test_clean_up()
 
-# argument parsing wirks as it should, the proper values are stored and the 
+# argument parsing works as it should, the proper values are stored and the 
 # double dash flags work as well as the short flags
 #test_parse_args()
 
