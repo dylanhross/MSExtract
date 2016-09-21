@@ -47,17 +47,15 @@ def prep_parser():
     parser.add_argument('-c', '--clean-up',\
     			        required=False,\
     			        help='Clean up unecessary files after completion',\
-    			        dest='clean_up',\
+    			        dest='clean',\
     			        action='store_true')
     parser.add_argument('-v', '--verbose',\
     			        required=False,\
     			        help='Be loud and noisy',\
     			        dest='verbose',\
-    			        action='store_true')
-    			
-    ### NOTE: The cleanup is not required but when indicated is always true, I think that this works 
-    ###         the way we are intending but I need to test it			
+    			        action='store_true')			
     return parser
+
 
 # build_cdcr_call
 #
@@ -78,16 +76,10 @@ def build_cdcr_call(param_set, raw_file, ms_file, path_to_cdcr):
     i_flag = "--im_file 'IM.txt' "
     ms_start_flag = "--mass_start " + str(param_set[2]) + " "
     ms_end_flag = "--mass_end " + str(param_set[3]) + " "
-
-    ### MARK: we need to test this out with actual calls to CDCReader but I am curious if the values for 
-    ###         scan start/end and dt scan start/end need to be cast to ints (or rounded then cast to 
-    ###         ints) prior to the cast to strings? I dont know but I think that CDCReader may expect 
-    ###         integers since the values are binned
-
-    rt_scan_start_flag = "--scan_start " + str(param_set[4]) + " "
-    rt_scan_end_flag = "--scan_end " + str(param_set[5]) + " "
-    dt_scan_start_flag = "--dt_scan_start " + str(param_set[6]) + " "
-    dt_scan_end_flag = "--dt_scan_end " + str(param_set[7]) + " "
+    rt_scan_start_flag = "--scan_start " + str(int(round(param_set[4]))) + " "
+    rt_scan_end_flag = "--scan_end " + str(int(round(param_set[5]))) + " "
+    dt_scan_start_flag = "--dt_scan_start " + str(int(round(param_set[6]))) + " "
+    dt_scan_end_flag = "--dt_scan_end " + str(int(round(param_set[7]))) + " "
     # do not perform any smoothing
     numberSmoothFlagLine = "--ms_number_smooth 0 "
     smoothWindowFlagLine = "--ms_smooth_window 0 "
@@ -114,6 +106,7 @@ def build_cdcr_call(param_set, raw_file, ms_file, path_to_cdcr):
     # return the line containing the final function call
     return call_line
 
+
 # get_param_str
 #
 #   combines a parameter set into a single string using the formula: 
@@ -135,6 +128,7 @@ def get_param_str(param_set):
 			param_str += "_"
     return param_str
 
+
 # get_ms_name
 #
 #   creates a systematic name for the MS file converted from a raw file by CDCReader using the
@@ -151,6 +145,7 @@ def get_ms_name(param_set, raw_file):
 	# os.path.splitext removes .raw from the end of file name
 	return os.path.splitext(raw_file)[0] + "_" + get_param_str(param_set) + "MS.txt"
 
+
 # get_csv_name
 #
 #   creates a systematic name for the .csv output file using the formula: "pepmz_z.csv" where pepmz
@@ -164,6 +159,7 @@ def get_ms_name(param_set, raw_file):
 #		csv_filename (string) -- the name of the MS file
 def get_csv_name(param_set):
 	return str(param_set[0]).replace(".", "p") + "_" + str(param_set[1]) + ".csv"
+
 
 # match_data_shape
 #
@@ -193,6 +189,7 @@ def match_data_shape(array1, array2):
 	# need to return the two (possibly altered) arrays
 	return array1, array2
 
+
 # cdcr_conv_rawfiles
 #
 #   loops through a list of raw files making calls to CDCReader using a parameter set
@@ -217,11 +214,7 @@ def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr, quiet=True):
             print "Now converting " + raw_file + " using parameter set " + get_param_str(param_set) + "..."
      
         # call CDCReader on each raw file
-        #call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
-        print
-        print build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr)
-        print
-
+        call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
         if not quiet:
             print "...DONE"
 
@@ -276,11 +269,9 @@ def clean_up():
     # regular expression for the MS.txt files
     for name in os.listdir('.'):
         if pattern.match(name):
-
-            ### DEBUG: prints what files would have been removed but does not remove them
-
-            print name, "would have been removed"
-            #os.remove(name)
+            os.remove(name)
+    # remove IM.txt
+    os.remove("IM.txt")
 
 
 # main execution pathway (invoked when program is called directly)
@@ -288,27 +279,17 @@ if __name__ == "__main__":
 
     ### NOTE: anything that you want printed to the console during execution should go in
     ###         this section 
-    
 
     # create an argument parser and get the command line arguments
     print
     args = prep_parser().parse_args()
-    
-    ### TODO: uncomment this code piece by piece as we test each step in the protocol
-    ###         |
-    ###         V
-    """
     # import data from input files
     param_sets = numpy.genfromtxt(args.param_set_list_filename, delimiter=',', unpack=True)
     raw_files = numpy.genfromtxt(args.raw_file_list_filename, dtype=str)
-
     # loop through parameter set list and perform file conversion and data combination for each 
     # parameter set
-    for n in range(len(param_sets)):
-        comb_param_set_data(cdcr_conv_rawfiles(param_sets[:,n], raw_files, args.path_to_cdcr, quiet=(not args.verbose), param_sets[:,n])
-
+    for n in range(len(param_sets[0,:])):
+        comb_param_set_data(cdcr_conv_rawfiles(param_sets[:,n], raw_files, args.path_to_cdcr, quiet=(not args.verbose)), param_sets[:,n])
     # if clean-up flag has been set, remove any unneeded files from the working directory
-    if args.clean_up:
+    if args.clean:
     	clean_up()
-    """
-    
