@@ -1,3 +1,0 @@
-002_UN.raw
-018_3min_Blue.raw
-021_120min_Blue.raw
