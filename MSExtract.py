@@ -224,6 +224,28 @@ def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr, quiet=True):
     return ms_files
 
 
+# get_cal__numbers
+#
+#   looks in a raw file's _HEADER.txt file for the mass calibration parameters
+#
+#   parameters:
+#		filename (string) -- the name of the .raw file to look for calibration parameters in the 
+#                               header file
+#		[cal_line (int)] -- the line in the xxxx.raw/_HEADER.txt file containing the calibration
+#                           numbers [optional, default=51] 
+#	returns:
+#		numbers (list) -- a list of all the numbers found in the specified line of the header file
+def get_cal_numbers(filename, cal_line=52):
+    with open(filename + "/_HEADER.txt", "r") as input:
+        cal_string = input.readlines()[cal_line - 1]
+        if not cal_string.startswith('$$ Cal Function'):
+            raise ValueError('line ' + str(cal_line) + ' of '+ filename + '/_HEADER.txt did' + \
+                    ' not contian "$$ Cal Function"... please check the contents of that file')
+        # regex for matching numbers in exponential notation (e.g. -123.456e7 or 123.456e-7)
+        # '[-]*\d+[.]\d+[e][-]*\d+'
+        return re.findall('[-]*\d+[.]\d+[e][-]*\d+', cal_string)
+
+
 # comb_param_set_data
 #
 #   combines all of the extracted MS data files generated using a single parameter set into one .csv
