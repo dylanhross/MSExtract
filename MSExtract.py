@@ -208,7 +208,8 @@ def get_cal_numbers(filename, cal_line=52):
                     ' not contian "$$ Cal Function"... please check the contents of that file')
         # regex for matching numbers in exponential notation (e.g. -123.456e7 or 123.456e-7)
         # '[-]*\d+[.]\d+[e][-]*\d+'
-        return re.findall('[-]*\d+[.]\d+[e][-]*\d+', cal_string)
+        # return the list converted into floats
+        return [float(i) for i in re.findall('[-]*\d+[.]\d+[e][-]*\d+', cal_string)]
 
 
 # correct_mz
@@ -221,7 +222,7 @@ def get_cal_numbers(filename, cal_line=52):
 #	returns:
 #		corrected_mz (float) -- the corrected m/z value
 def correct_mz(cal_numbers, mz):
-    sqrt_mz = np.sqrt(mz)
+    sqrt_mz = numpy.sqrt(mz)
     sqrt_mz = cal_numbers[0] + sqrt_mz * \
             (cal_numbers[1] + sqrt_mz * \
             (cal_numbers[2] + sqrt_mz * \
@@ -279,25 +280,22 @@ def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr, quiet=True):
 #	returns:
 #		none
 def comb_param_set_data(data_files, param_set):
-	# create a master data array starting with the first MS data file
-	master_data = numpy.genfromtxt(data_files[0][0], unpack=True)
-
-        ### TODO: correct first set of mz values here
-        
-
-	# loop through data_files and import their data
-	for n in range(1, len(data_files)):
-		# import the next data set
-		add_data = numpy.genfromtxt(data_files[n][0], unpack=True)
-
-        ### TODO: correct mz values in add_data here
-
-		# match the column lengths between master_data and add_data so they can be added together
-		master_data,add_data = match_data_shape(master_data, add_data)
-		# append add_data to master_data
-		master_data = numpy.append(master_data, add_data, 0)
-	# save combined data into a csv file
-	numpy.savetxt((get_csv_name(param_set)), numpy.transpose(master_data), delimiter=",", fmt='%.6f')
+    # create a master data array starting with the first MS data file
+    master_data = numpy.genfromtxt(data_files[0][0], unpack=True)
+    # correct the first set of mz values
+    master_data[0] = correct_mz(get_cal_numbers(data_files[0][1]), master_data[0])
+    # loop through data_files and import their data
+    for n in range(1, len(data_files)):
+        # import the next data set
+        add_data = numpy.genfromtxt(data_files[n][0], unpack=True)
+        # correct mz values in add_data
+        master_data[0] = correct_mz(get_cal_numbers(data_files[n][1]), master_data[0])
+        # match the column lengths between master_data and add_data so they can be added together
+        master_data,add_data = match_data_shape(master_data, add_data)
+        # append add_data to master_data
+        master_data = numpy.append(master_data, add_data, 0)
+    # save combined data into a csv file
+    numpy.savetxt((get_csv_name(param_set)), numpy.transpose(master_data), delimiter=",", fmt='%.6f')
 
 
 # clean_up
