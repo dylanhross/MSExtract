@@ -189,42 +189,7 @@ def match_data_shape(array1, array2):
 	# need to return the two (possibly altered) arrays
 	return array1, array2
 
-
-# cdcr_conv_rawfiles
-#
-#   loops through a list of raw files making calls to CDCReader using a parameter set
-#
-#   parameters:
-#		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
-#                           rt_max, dt_min, dt_max
-#		raw_files (list) -- list of raw files to convert with CDCReader
-#       path_to_cdcr (string) -- full path to the CDCReader executable
-#       [quiet (boolean)] -- don't print any information about what files are being converted 
-#                               [default = True] 
-#	returns:
-#		ms_files (list) -- a list of CDCReader output MS.txt files generated using one parameter set
-def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr, quiet=True):
-    # create a list of MS files to eventually combine
-    ms_files = []
-    # loop through raw files
-    for raw_file in raw_files:
-    	ms_name = get_ms_name(param_set, raw_file)
-
-        if not quiet:
-            print "Now converting " + raw_file + " using parameter set " + get_param_str(param_set) + "..."
-     
-        # call CDCReader on each raw file
-        call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
-        if not quiet:
-            print "...DONE"
-
-        # add the ms filename to the list of ms files
-        ms_files.append(ms_name)
-    # return the list of converted ms files
-    return ms_files
-
-
-# get_cal__numbers
+# get_cal_numbers
 #
 #   looks in a raw file's _HEADER.txt file for the mass calibration parameters
 #
@@ -246,25 +211,87 @@ def get_cal_numbers(filename, cal_line=52):
         return re.findall('[-]*\d+[.]\d+[e][-]*\d+', cal_string)
 
 
+# correct_mz
+#
+#   corrects an mz value using mass calibration parameters from the _HEADER.txt file
+#
+#   parameters:
+#		cal_numbers (list) -- a list of all mass calibration numbers from the _HEADER.txt file
+#       mz (float) -- the m/z to correct
+#	returns:
+#		corrected_mz (float) -- the corrected m/z value
+def correct_mz(cal_numbers, mz):
+    sqrt_mz = np.sqrt(mz)
+    sqrt_mz = cal_numbers[0] + sqrt_mz * \
+            (cal_numbers[1] + sqrt_mz * \
+            (cal_numbers[2] + sqrt_mz * \
+            (cal_numbers[3] + sqrt_mz * \
+            (cal_numbers[4] + sqrt_mz * \
+            (cal_numbers[5])))))
+    return sqrt_mz * sqrt_mz
+
+
+# cdcr_conv_rawfiles
+#
+#   loops through a list of raw files making calls to CDCReader using a parameter set
+#
+#   parameters:
+#		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
+#                           rt_max, dt_min, dt_max
+#		raw_files (list) -- list of raw files to convert with CDCReader
+#       path_to_cdcr (string) -- full path to the CDCReader executable
+#       [quiet (boolean)] -- don't print any information about what files are being converted 
+#                               [default = True] 
+#	returns:
+#		ms_files (list) -- a list of CDCReader output MS.txt files generated using one parameter set
+#                           and the raw file that each was generated from
+def cdcr_conv_rawfiles(param_set, raw_files, path_to_cdcr, quiet=True):
+    # create a list of MS files to eventually combine
+    ms_files = []
+    # loop through raw files
+    for raw_file in raw_files:
+    	ms_name = get_ms_name(param_set, raw_file)
+        # verbose option
+        if not quiet:
+            print "Now converting " + raw_file + " using parameter set " + get_param_str(param_set) + "..."
+        # call CDCReader on each raw file
+        call(build_cdcr_call(param_set, raw_file, ms_name, path_to_cdcr))
+        # verbose option
+        if not quiet:
+            print "...DONE"
+        # add the ms filename and the raw filename to the list of ms files
+        ms_files.append([ms_name, raw_file])
+    # return the list of converted ms files
+    return ms_files
+
+
 # comb_param_set_data
 #
 #   combines all of the extracted MS data files generated using a single parameter set into one .csv
-#	file named using the formula: "pepmz_z.csv"
+#	file named using the formula: "pepmz_z.csv". Also corrects mz values using the mass calibration 
+#   parameters in the _HEADER.txt file inside the .raw file
 #
 #   parameters:
 #		data_files (list) -- a list of CDCReader output MS.txt files generated using a single
-#								parameter set
+#								parameter set and the raw files they were generated from
 #		param_set (list) -- list of parameters to use, in order: pep_mz, z, mz_min, mz_max, rt_min, 
 #                           rt_max, dt_min, dt_max
 #	returns:
 #		none
 def comb_param_set_data(data_files, param_set):
 	# create a master data array starting with the first MS data file
-	master_data = numpy.genfromtxt(data_files[0], unpack=True)
+	master_data = numpy.genfromtxt(data_files[0][0], unpack=True)
+
+        ### TODO: correct first set of mz values here
+        
+
 	# loop through data_files and import their data
 	for n in range(1, len(data_files)):
 		# import the next data set
-		add_data = numpy.genfromtxt(data_files[n], unpack=True)
+		add_data = numpy.genfromtxt(data_files[n][0], unpack=True)
+
+        ### TODO: correct mz values in add_data here
+
 		# match the column lengths between master_data and add_data so they can be added together
 		master_data,add_data = match_data_shape(master_data, add_data)
 		# append add_data to master_data
