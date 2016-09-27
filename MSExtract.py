@@ -289,7 +289,7 @@ def comb_param_set_data(data_files, param_set):
         # import the next data set
         add_data = numpy.genfromtxt(data_files[n][0], unpack=True)
         # correct mz values in add_data
-        master_data[0] = correct_mz(get_cal_numbers(data_files[n][1]), master_data[0])
+        add_data[0] = correct_mz(get_cal_numbers(data_files[n][1]), add_data[0])
         # match the column lengths between master_data and add_data so they can be added together
         master_data,add_data = match_data_shape(master_data, add_data)
         # append add_data to master_data
